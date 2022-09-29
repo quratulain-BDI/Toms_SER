@@ -1,7 +1,8 @@
 import typer
+from ser.infer import def_infer
 
 main = typer.Typer()
-
+here's a change to create a conflict
 
 @main.command()
 def train():
@@ -10,4 +11,4 @@ def train():
 
 @main.command()
 def infer():
-    pass
+    def_infer()
