@@ -16,15 +16,25 @@ DATA_DIR = PROJECT_ROOT / "data"
 
 @main.command()
 def train(
+    learning_rate: int ,
     name: str = typer.Option(
         ..., "-n", "--name", help="Name of experiment to save under."
     ),
-):
+    epochs: int = typer.Option(
+        ...,'-e','--epochs',help="The number of epochs to run"
+        ),
+    batch_size: int = typer.Option(
+        ...,'-b','--batch_size',help="The number of batch_size to run"
+        )
+    ):
+
+
+
     print(f"Running experiment {name}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    epochs = 2
-    batch_size = 1000
-    learning_rate = 0.01
+    # epochs = 2
+    # batch_size = 1000
+    # learning_rate = 0.01
 
     # save the parameters!
 
