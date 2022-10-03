@@ -11,7 +11,7 @@ from ser.constants import RESULTS_DIR
 from ser.data import train_dataloader, val_dataloader, test_dataloader
 from ser.params import Params, save_params
 from ser.transforms import transforms, normalize
-
+from ser.visual_helper import *
 main = typer.Typer()
 
 
@@ -60,9 +60,13 @@ def train(
 
 
 @main.command()
-def infer():
-    run_path = Path("./results/2022-10-03 11:29:17.631385/")
-    label = 6
+def infer(
+     label: int = typer.Option(
+        ..., "-l", "--label", help="Enter the label to pick images."
+    )
+):
+    run_path = Path("./results/2022-10-03 13:27:51.640216/")
+    
 
     # TODO load the parameters from the run_path so we can print them out!
     f = open(run_path/'run_params.json')
@@ -97,24 +101,3 @@ def infer():
     pixels = images[0][0]
     print(generate_ascii_art(pixels))
     print(f"This is a {pred}")
-
-
-def generate_ascii_art(pixels):
-    ascii_art = []
-    for row in pixels:
-        line = []
-        for pixel in row:
-            line.append(pixel_to_char(pixel))
-        ascii_art.append("".join(line))
-    return "\n".join(ascii_art)
-
-
-def pixel_to_char(pixel):
-    if pixel > 0.99:
-        return "O"
-    elif pixel > 0.9:
-        return "o"
-    elif pixel > 0:
-        return "."
-    else:
-        return " "
