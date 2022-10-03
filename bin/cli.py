@@ -4,7 +4,8 @@ from pathlib import Path
 import typer
 import torch
 import git
-
+import json
+from ser.model import Net
 from ser.train import train as run_train
 from ser.constants import RESULTS_DIR
 from ser.data import train_dataloader, val_dataloader, test_dataloader
@@ -60,23 +61,37 @@ def train(
 
 @main.command()
 def infer():
-    run_path = Path("./path/to/one/of/your/training/runs")
+    run_path = Path("./results/2022-10-03 11:29:17.631385/")
     label = 6
 
     # TODO load the parameters from the run_path so we can print them out!
+    f = open(run_path/'run_params.json')
+    params = data = json.load(f)
+    print('Rum paramaeters are:\n \n',params)
+
+    
+    f = open(run_path/'best_params.json')
+    params = data = json.load(f)
+    print('Hyper paramaeters are:\n \n',params)
+
+ # load the model
+   # model = torch.load(run_path / "model.pt")
+
+    model = Net()
+    model.load_state_dict(torch.load(run_path / "model.pt"))
 
     # select image to run inference for
     dataloader = test_dataloader(1, transforms(normalize))
     images, labels = next(iter(dataloader))
     while labels[0].item() != label:
+        #print(labels[0].item())
         images, labels = next(iter(dataloader))
 
-    # load the model
-    model = torch.load(run_path / "model.pt")
-
+   
     # run inference
     model.eval()
     output = model(images)
+    print(output)
     pred = output.argmax(dim=1, keepdim=True)[0].item()
     certainty = max(list(torch.exp(output)[0]))
     pixels = images[0][0]
