@@ -11,7 +11,7 @@ class Params:
     commit: str
 
 
-PARAMS_FILE = "params.json"
+PARAMS_FILE = "run_params.json"
 
 
 def save_params(run_path, params):

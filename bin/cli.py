@@ -4,6 +4,7 @@ from pathlib import Path
 import typer
 import torch
 import git
+from typing  import List, Optional
 
 from ser.train import train as run_train
 from ser.constants import RESULTS_DIR
@@ -11,7 +12,7 @@ from ser.data import train_dataloader, val_dataloader, test_dataloader
 from ser.infer import infer as run_infer
 from ser.params import Params, save_params, load_params
 from ser.transforms import transforms, normalize, flip
-
+import torchvision
 main = typer.Typer()
 
 
@@ -67,22 +68,31 @@ def infer(
     label: int = typer.Option(
         6, "-l", "--label", help="Label of image to show to the model"
     ),
+
+    ts: Optional[List[str]] = typer.Option(...,"-ts"
+    ,help = 'Enter the list of transformations to perform')
+
 ):
+
+    print(ts)
     """Run the inference code"""
     params = load_params(run_path)
     model = torch.load(run_path / "model.pt")
-    image = _select_test_image(label)
-    run_infer(params, model, image, label)
+    image = _select_test_image(ts, label)
+    run_infer(run_path,params, model, image, label)
 
 
-def _select_test_image(label):
+def _select_test_image(ts,label
+):
     # TODO `ts` is a list of transformations that will be applied to the loaded
     # image. This works... but in order to add a transformation, or change one,
     # we now have to come and edit the code... which sucks. What if we could
     # configure the transformations via the cli?
-    ts = [normalize, flip]
+
+    #ts = [normalize, flip]
     dataloader = test_dataloader(1, transforms(*ts))
     images, labels = next(iter(dataloader))
+    print(torchvision.transforms.functional.get_image_size(images))
     while labels[0].item() != label:
         images, labels = next(iter(dataloader))
     return images

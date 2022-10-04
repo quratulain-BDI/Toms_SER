@@ -1,8 +1,9 @@
 import torch
 
+from ser.model import Net
 
 @torch.no_grad()
-def infer(params, model, image, label):
+def infer(run_path,params, model, image, label):
     print(f"\nRunning inference for the model\n -  {params.name}")
     print(f"It was trained with the following hyperparameters:")
     print(f"  - Epochs:        {params.epochs}")
@@ -11,6 +12,9 @@ def infer(params, model, image, label):
     print(f"The image you have asked to classify is a {label}.")
 
     # Infer label and calculate certainty
+    model = Net()
+    model.load_state_dict(torch.load(run_path / "model.pt"))
+
     model.eval()
     output = model(image)
     pred = output.argmax(dim=1, keepdim=True)[0].item()
